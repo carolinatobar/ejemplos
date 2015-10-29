@@ -1,0 +1,105 @@
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['table']}]}"></script>
+  
+
+ <script type="text/javascript">
+
+google.load('visualization', '1', {packages: ['corechart', 'bar','table']});
+google.setOnLoadCallback(drawStacked);
+
+
+
+function drawStacked() {
+
+ var data = google.visualization.arrayToDataTable([
+        ["Fecha", "Density","variable",'ADR'],
+        ['2015-10-02', 8.94, 5, 6],
+        ['2015-10-03', 10.49,6, 8],
+        ['2015-10-04', 19.30,7, 10],
+        ['2015-10-05', 21.45,8, 12]
+
+     
+      ]);
+
+      var view = new google.visualization.DataView(data);
+      view.setColumns([0, 1,
+                       { calc: "stringify",
+                         sourceColumn: 1,
+                         type: "string",
+                         role: "annotation" },
+                       2,{ calc: "stringify",
+                         sourceColumn: 2,
+                         type: "string",
+                         role: "annotation" }
+                         ]);
+
+      var options = {
+       title: 'Pronóstico Corto Plazo',
+        isStacked: true,
+        hAxis: {
+          title: 'Días',
+          format: 'M/d',
+          titleTextStyle: {color: 'green'},
+          direction:1, 
+          slantedText:true, 
+          slantedTextAngle: 90, 
+          textStyle: {fontName: 'verdana', color: '#595959', fontSize: 10},
+
+        },
+        vAxes:{
+            
+               1:{format:'$#'},
+               2:{format:'$#'}      
+        },
+   
+        series: {
+            0: {targetAxisIndex:0},
+            1: {targetAxisIndex:0},
+            2: {targetAxisIndex:1, type: 'line'}
+        },
+      };
+
+
+
+      var chart = new google.visualization.ColumnChart(document.getElementById("barchart_values"));
+      chart.draw(view,options);
+
+      var table = new google.visualization.Table(document.getElementById('table_div'));
+
+        function agregarDia(fecha, dia) {
+            return new Date(fecha.getTime() + dia*24*60*60*1000);
+        }
+
+        function selectHandler() {
+          var selectedItem = chart.getSelection()[0];
+              if (selectedItem) {
+                var value  = view.getValue(selectedItem.row, selectedItem.column);
+                var value1 = view.getValue(selectedItem.row, 0);
+
+                var fecha1 = agregarDia(new Date(value1), 2);
+                var fecha1_a = fecha1.getFullYear().toString() + "-"
+                                + ('0' + (fecha1.getMonth()+1)).slice(-2).toString()+"-"
+                                + ('0' + fecha1.getDate()).slice(-2).toString();
+           
+                 var dataT = google.visualization.arrayToDataTable([
+                  ['',value1]
+                 ]);
+
+                 table.draw(dataT); 
+
+                 
+               
+              }
+        }
+
+      google.visualization.events.addListener(chart, 'select', selectHandler);
+
+  }
+
+
+  </script>
+<div id="barchart_values" style="width: 900px; height: 300px; text-align:center"></div>
+<div id="table_div" style="width: 100%"></div>
+
+
+  
